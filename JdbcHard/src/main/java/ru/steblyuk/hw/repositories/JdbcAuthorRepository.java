@@ -1,10 +1,9 @@
 package ru.steblyuk.hw.repositories;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ru.steblyuk.hw.models.Author;
@@ -21,18 +20,17 @@ public class JdbcAuthorRepository implements AuthorRepository {
     private static final String ID_COLUMN_NAME = "id";
     private static final String FULL_NAME_COLUMN_NAME = "full_name";
 
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedJdbcTemplate;
+    private final NamedParameterJdbcOperations namedJdbcOperations;
 
     @Override
     public List<Author> findAll() {
-        return jdbcTemplate.query("select * from authors", new AuthorRowMapper());
+        return namedJdbcOperations.query("select id, full_name from authors", new AuthorRowMapper());
     }
 
     @Override
     public Optional<Author> findById(long id) {
         SqlParameterSource parameterSource = new MapSqlParameterSource(ID_PARAM_NAME, id);
-        return namedJdbcTemplate.query("select * from authors where id = :id", parameterSource, new AuthorRowMapper()).stream()
+        return namedJdbcOperations.query("select id, full_name from authors where id = :id", parameterSource, new AuthorRowMapper()).stream()
                 .findFirst();
     }
 
