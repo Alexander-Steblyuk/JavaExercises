@@ -30,7 +30,8 @@ public class JdbcAuthorRepository implements AuthorRepository {
     @Override
     public Optional<Author> findById(long id) {
         SqlParameterSource parameterSource = new MapSqlParameterSource(ID_PARAM_NAME, id);
-        return namedJdbcOperations.query("select id, full_name from authors where id = :id", parameterSource, new AuthorRowMapper()).stream()
+        return namedJdbcOperations.query("select id, full_name from authors where id = :id", parameterSource,
+                        new AuthorRowMapper()).stream()
                 .findFirst();
     }
 

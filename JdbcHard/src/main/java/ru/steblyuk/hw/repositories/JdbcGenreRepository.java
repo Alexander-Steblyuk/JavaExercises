@@ -30,7 +30,8 @@ public class JdbcGenreRepository implements GenreRepository {
     @Override
     public List<Genre> findAllByIds(Set<Long> ids) {
         SqlParameterSource parameterSource = new MapSqlParameterSource(IDS_PARAM_NAME, ids);
-        return namedJdbcOperations.query("select id, name from genres where id in :ids", parameterSource, new GenreRowMapper());
+        return namedJdbcOperations.query("select id, name from genres where id in :ids", parameterSource,
+                new GenreRowMapper());
     }
 
     private static class GenreRowMapper implements RowMapper<Genre> {
