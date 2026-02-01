@@ -1,6 +1,15 @@
 # Compiled class file
 *.class
 
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Maven ###
+target/
+
 # Log file
 *.log
 
