@@ -20,15 +20,10 @@ public class BookConverter {
                 .map(genreConverter::genreToString)
                 .map("{%s}"::formatted)
                 .collect(Collectors.joining(", "));
-        var commentsString = book.comments().stream()
-                .map(commentConverter::commentToString)
-                .map("{%s}"::formatted)
-                .collect(Collectors.joining(", "));
-        return "Id: %d, title: %s, author: {%s}, genres: [%s], comments [%s]".formatted(
+        return "Id: %d, title: %s, author: {%s}, genres: [%s]".formatted(
                 book.id(),
                 book.title(),
                 authorConverter.authorToString(book.author()),
-                genresString,
-                commentsString);
+                genresString);
     }
 }

@@ -14,6 +14,5 @@ public interface BookMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "title", source = "title")
     @Mapping(target = "genres", source = "genres")
-    @Mapping(target = "comments", source = "comments")
     BookDto mapToDto(Book book);
 }

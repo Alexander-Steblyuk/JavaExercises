@@ -10,17 +10,32 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
+@NamedEntityGraph(
+        name = "book-by-id",
+        attributeNodes = {
+                @NamedAttributeNode(value = "author"),
+                @NamedAttributeNode(value = "genres")
+        }
+)
+@NamedEntityGraph(
+        name = "all-books",
+        attributeNodes = {
+                @NamedAttributeNode(value = "author")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -42,16 +57,10 @@ public class Book {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @ManyToMany
-    @BatchSize(size = 10)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     @JoinTable(name = "books_genres",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
-
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "book")
-    @BatchSize(size = 10)
-    private List<Comment> comments;
 }

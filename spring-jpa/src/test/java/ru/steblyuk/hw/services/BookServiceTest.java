@@ -9,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.shell.boot.ShellRunnerAutoConfiguration;
-import ru.steblyuk.hw.config.RefreshDb;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.steblyuk.hw.dto.AuthorDto;
 import ru.steblyuk.hw.dto.BookDto;
-import ru.steblyuk.hw.dto.CommentDto;
 import ru.steblyuk.hw.dto.GenreDto;
 
 import java.util.List;
@@ -33,16 +32,13 @@ public class BookServiceTest {
 
     private List<GenreDto> dbGenres;
 
-    private List<CommentDto> dbComments;
-
     private List<BookDto> dbBooks;
 
     @BeforeEach
     void setUp() {
         dbAuthors = getDbAuthors();
         dbGenres = getDbGenres();
-        dbComments = getDbComments();
-        dbBooks = getDbBooks(dbAuthors, dbGenres, dbComments);
+        dbBooks = getDbBooks(dbAuthors, dbGenres);
     }
 
     @DisplayName("Должен загружать книгу по id")
@@ -63,7 +59,7 @@ public class BookServiceTest {
         actualBooks.forEach(System.out::println);
     }
 
-    @RefreshDb
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("Должен сохранять новую книгу")
     @Test
     void shouldSaveNewBook() {
@@ -74,13 +70,12 @@ public class BookServiceTest {
                 .isEqualTo(returnedBook);
     }
 
-    @RefreshDb
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("Должен сохранять измененную книгу")
     @Test
     void shouldSaveUpdatedBook() {
         var expectedBook = new BookDto(1L, "BookTitle_10500", dbAuthors.get(1),
-                List.of(dbGenres.get(3), dbGenres.get(4)),
-                List.of(dbComments.get(0), dbComments.get(1), dbComments.get(2), dbComments.get(3)));
+                List.of(dbGenres.get(3), dbGenres.get(4)));
         assertThat(bookService.findById(1)).isPresent()
                 .get()
                 .isNotEqualTo(expectedBook);
@@ -97,7 +92,7 @@ public class BookServiceTest {
                 .isEqualTo(returnedBook);
     }
 
-    @RefreshDb
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("Должен удалять книгу по id ")
     @Test
     void shouldDeleteBook() {
@@ -118,19 +113,12 @@ public class BookServiceTest {
                 .toList();
     }
 
-    private static List<CommentDto> getDbComments() {
-        return IntStream.range(1, 13).boxed()
-                .map(id -> new CommentDto(id, "Comment_" + id, (id - 1) / 4L + 1))
-                .toList();
-    }
-
-    private static List<BookDto> getDbBooks(List<AuthorDto> dbAuthors, List<GenreDto> dbGenres, List<CommentDto> dbComments) {
+    private static List<BookDto> getDbBooks(List<AuthorDto> dbAuthors, List<GenreDto> dbGenres) {
         return IntStream.range(1, 4).boxed()
                 .map(id -> new BookDto(id,
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2),
-                        dbComments.subList((id - 1) * 4, (id - 1) * 4 + 4))
+                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2))
                 )
                 .toList();
     }
@@ -138,7 +126,6 @@ public class BookServiceTest {
     private static List<BookDto> getDbBooks() {
         var dbAuthors = getDbAuthors();
         var dbGenres = getDbGenres();
-        var dbComments = getDbComments();
-        return getDbBooks(dbAuthors, dbGenres, dbComments);
+        return getDbBooks(dbAuthors, dbGenres);
     }
 }

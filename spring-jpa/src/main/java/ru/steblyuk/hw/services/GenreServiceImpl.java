@@ -2,7 +2,6 @@ package ru.steblyuk.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.steblyuk.hw.dto.GenreDto;
 import ru.steblyuk.hw.mappers.GenreMapper;
 import ru.steblyuk.hw.repositories.GenreRepository;
@@ -16,7 +15,6 @@ public class GenreServiceImpl implements GenreService {
 
     private final GenreMapper genreMapper;
 
-    @Transactional(readOnly = true)
     @Override
     public List<GenreDto> findAll() {
         return genreRepository.findAll().stream()

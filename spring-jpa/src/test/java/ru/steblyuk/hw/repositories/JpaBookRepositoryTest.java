@@ -9,10 +9,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import ru.steblyuk.hw.models.Author;
 import ru.steblyuk.hw.models.Book;
-import ru.steblyuk.hw.models.Comment;
 import ru.steblyuk.hw.models.Genre;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -33,15 +31,12 @@ class JpaBookRepositoryTest {
 
     private List<Genre> dbGenres;
 
-    private List<Comment> dbComments;
-
     private List<Book> dbBooks;
 
     @BeforeEach
     void setUp() {
         dbAuthors = getDbAuthors();
         dbGenres = getDbGenres();
-        dbComments = getDbComments();
         dbBooks = getDbBooks();
     }
 
@@ -68,7 +63,7 @@ class JpaBookRepositoryTest {
     @Test
     void shouldSaveNewBook() {
         var book = new Book(0, "BookTitle_10500", dbAuthors.get(0),
-                List.of(dbGenres.get(0), dbGenres.get(2)), new ArrayList<>());
+                List.of(dbGenres.get(0), dbGenres.get(2)));
         var returnedBook = bookRepository.save(book);
         assertThat(entityManager.find(Book.class, returnedBook.getId()))
                 .isEqualTo(returnedBook);
@@ -78,8 +73,7 @@ class JpaBookRepositoryTest {
     @Test
     void shouldSaveUpdatedBook() {
         var expectedBook = new Book(1L, "BookTitle_10500", dbAuthors.get(2),
-                List.of(dbGenres.get(4), dbGenres.get(5)),
-                List.of(dbComments.get(0), dbComments.get(1), dbComments.get(2), dbComments.get(3)));
+                List.of(dbGenres.get(4), dbGenres.get(5)));
 
         assertThat(entityManager.find(Book.class, expectedBook.getId()))
                 .isNotEqualTo(expectedBook);
@@ -112,12 +106,6 @@ class JpaBookRepositoryTest {
     private List<Genre> getDbGenres() {
         return IntStream.range(1, 7).boxed()
                 .map(id -> entityManager.find(Genre.class, id))
-                .toList();
-    }
-
-    private List<Comment> getDbComments() {
-        return IntStream.range(1, 13).boxed()
-                .map(id -> entityManager.find(Comment.class, id))
                 .toList();
     }
 

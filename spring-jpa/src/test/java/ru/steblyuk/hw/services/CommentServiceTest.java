@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.shell.boot.ShellRunnerAutoConfiguration;
-import ru.steblyuk.hw.config.RefreshDb;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.steblyuk.hw.dto.CommentDto;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public class CommentServiceTest {
         assertThat(actual).containsExactlyElementsOf(expected);
     }
 
-    @RefreshDb
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("Должен сохранять новый комментарий к книге")
     @Test
     void shouldSaveNewComment() {
@@ -62,10 +62,9 @@ public class CommentServiceTest {
         assertThat(commentService.findById(returnedComment.id())).isPresent()
                 .get()
                 .isEqualTo(returnedComment);
-        //refreshDb();
     }
 
-    @RefreshDb
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("Должен сохранять измененный комментарий к книге")
     @Test
     void shouldSaveUpdatedComment() {
@@ -85,17 +84,15 @@ public class CommentServiceTest {
         assertThat(commentService.findById(returnedComment.id())).isPresent()
                 .get()
                 .isEqualTo(returnedComment);
-        //refreshDb();
     }
 
-    @RefreshDb
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("Должен удалять комментарий по id ")
     @Test
     void shouldDeleteComment() {
         assertThat(commentService.findById(9L)).isPresent();
         commentService.deleteById(9L);
         assertThat(commentService.findById(9L)).isEmpty();
-        //refreshDb();
     }
 
     private static List<CommentDto> getDbComments() {

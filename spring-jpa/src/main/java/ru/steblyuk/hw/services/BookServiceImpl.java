@@ -9,7 +9,6 @@ import ru.steblyuk.hw.mappers.BookMapper;
 import ru.steblyuk.hw.models.Book;
 import ru.steblyuk.hw.repositories.AuthorRepository;
 import ru.steblyuk.hw.repositories.BookRepository;
-import ru.steblyuk.hw.repositories.CommentRepository;
 import ru.steblyuk.hw.repositories.GenreRepository;
 
 import java.util.List;
@@ -24,8 +23,6 @@ public class BookServiceImpl implements BookService {
     private final AuthorRepository authorRepository;
 
     private final GenreRepository genreRepository;
-
-    private final CommentRepository commentRepository;
 
     private final BookRepository bookRepository;
 
@@ -77,9 +74,8 @@ public class BookServiceImpl implements BookService {
         if (isEmpty(genres) || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
-        var comments = commentRepository.findByBookId(id);
 
-        var book = new Book(id, title, author, genres, comments);
+        var book = new Book(id, title, author, genres);
         return bookRepository.save(book);
     }
 }
