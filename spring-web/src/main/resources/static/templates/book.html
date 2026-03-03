@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Book</title>
+        <div th:replace="~{header-template :: books-link}"></div>
+        <link rel="stylesheet" href="../css/styles.css">
+    </head>
+    <body>
+        <h2>Book</h2>
+        <div>
+            <p><span th:text = "${'Title: ' + book.title}"></span></p>
+            <p><span th:text = "${'Author: ' + book.author.fullName}"></span></p>
+            <label for="genres">Genres:</label>
+            <ul id="genres" th:each="genre : ${book.genres}">
+                <li th:text="${genre.name}"></li>
+            </ul>
+        </div>
+        <div>
+            <label for="comments">Comments</label>
+            <table id="comments">
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="comment,rowStat  : ${comments}">
+                    <td th:text="${rowStat.index + 1}"></td>
+                    <td th:text="${comment.content}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
