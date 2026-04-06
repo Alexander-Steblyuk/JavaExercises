@@ -8,8 +8,12 @@ import ru.steblyuk.hw.exceptions.EntityNotFoundException;
 import ru.steblyuk.hw.mappers.BookDtoMapper;
 import ru.steblyuk.hw.mappers.BookMapper;
 import ru.steblyuk.hw.models.Author;
+import ru.steblyuk.hw.models.Genre;
+import ru.steblyuk.hw.repositories.AuthorRepository;
 import ru.steblyuk.hw.repositories.BookRepository;
+import ru.steblyuk.hw.repositories.GenreRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -22,6 +26,10 @@ public class BookServiceImpl implements BookService {
     private static final String BOOK_NOT_FOUND_ERROR_MESSAGE_TEMPLATE = "Book with id(%s) is not found!";
 
     private final BookRepository bookRepository;
+
+    private final AuthorRepository authorRepository;
+
+    private final GenreRepository genreRepository;
 
     private final BookMapper bookMapper;
 
@@ -48,14 +56,30 @@ public class BookServiceImpl implements BookService {
     public BookDto save(BookDto bookDto) {
         var book = bookDtoMapper.mapToEntity(bookDto);
 
-        if (isEmpty(book.getGenres())) {
-            throw new IllegalArgumentException("Genres must not be empty or null");
-        }
-
-        ofNullable(book.getAuthor())
+        long authorId = ofNullable(book.getAuthor())
                 .map(Author::getId)
                 .orElseThrow(() -> new IllegalArgumentException("Book must have no empty author"));
 
+        var author = authorRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
+
+
+        List<Long> genresIds = ofNullable(book.getGenres())
+                .orElseGet(ArrayList::new).stream()
+                .map(Genre::getId)
+                .toList();
+
+        if (isEmpty(genresIds)) {
+            throw new IllegalArgumentException("Genres must not be empty or null");
+        }
+
+        var genres = genreRepository.findAllById(genresIds);
+        if (isEmpty(genres) || genresIds.size() != genres.size()) {
+            throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
+        }
+
+        book.setAuthor(author);
+        book.setGenres(genres);
         book = bookRepository.save(book);
         return bookMapper.mapToDto(book);
     }
