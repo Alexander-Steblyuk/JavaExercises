@@ -1,0 +1,39 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Book edit</title>
+        <link rel="stylesheet" href="../css/styles.css">
+        <div th:replace="~{header-template :: books-link}"></div>
+    </head>
+    <body>
+        <h2>Book edit</h2>
+        <form th:action="@{/books/save}" th:object="${book}"  th:method="post"
+              aria-orientation="vertical">
+            <div>
+                <input type="hidden" th:field="*{id}" id="id">
+            </div>
+            <div>
+                <label for="title">Title</label>
+                <input type="text" th:field="*{title}" id="title" placeholder="Title">
+                <br><span class="error-message" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+            </div>
+            <br>
+            <div>
+                <label for="author">Author</label>
+                <select id="author" th:field="*{author}">
+                    <option th:each="author : ${allAuthors}" th:value="${author}" th:text="${author.fullName}"></option>
+                </select>
+                <br><span class="error-message" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+            </div>
+            <br>
+            <div>
+                <label for="genres">Genres</label>
+                <select id="genres" th:field="*{genres}" multiple="multiple">
+                    <option th:each="genre : ${allGenres}" th:value="${genre}" th:text="${genre.name}"></option>
+                </select>
+                <br><span class="error-message" th:if="${#fields.hasErrors('genres')}" th:errors="*{genres}"></span>
+            </div>
+            <br>
+            <button type="submit">Save book</button>
+        </form>
+    </body>
+</html>

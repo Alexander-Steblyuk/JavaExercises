@@ -1,0 +1,38 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Books</title>
+        <link rel="stylesheet" href="../css/styles.css">
+    </head>
+    <body>
+        <h2>Books</h2>
+        <p><a href="/books/add">Add a new book</a></p>
+        <table id="books">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genres</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td><a th:text="${book.title}" th:href="@{/books/{id}(id=${book.id})}"></a></td>
+                <td th:text="${book.author.fullName}"></td>
+                <td th:text="${#strings.arrayJoin(book.genres.![name], ', ')}"></td>
+                <td><a th:href="@{/books/edit/{id}(id=${book.id})}">Edit</a></td>
+                <td>
+                    <form th:action="@{/books/{id}(id=${book.id})}" th:method="delete">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </body>
+    <footer>
+        <p><a href="/authors">Get to authors list</a></p>
+        <p><a href="/genres">Get to genres list</a></p>
+    </footer>
+</html>
