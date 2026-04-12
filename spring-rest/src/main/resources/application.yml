@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:maindb
+  sql:
+    init:
+      mode: never
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/schema,classpath:db/migration/data
+    migrate-on-start: true
+  jpa:
+    hibernate:
+      ddl-auto: none
