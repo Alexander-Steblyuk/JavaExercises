@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 public class CommentController {
 
-    private CommentService commentService;
+    private final CommentService commentService;
 
     @GetMapping("/books/{id}/comments")
     public List<CommentDto> getByBookId(@PathVariable Long id) {

@@ -104,12 +104,12 @@ public class BookControllerTest {
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newBookJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedBookJson));
     }
 
-    @DisplayName("Должен сохранять измененную книгу и возвращать на список книг")
+    @DisplayName("Должен сохранять измененную книгу")
     @Test
     void shouldSaveUpdatedBook() throws Exception {
         var expectedBook = new BookDto(1L, "BookTitle_10500", dbAuthors.get(1),
@@ -139,7 +139,7 @@ public class BookControllerTest {
     @Test
     void shouldDeleteBook() throws Exception {
         mockMvc.perform(delete("/books/{id}", 1L))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     private static List<AuthorDto> getDbAuthors() {
