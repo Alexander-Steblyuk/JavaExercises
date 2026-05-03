@@ -1,0 +1,12 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Error</title>
+    <div th:replace="~{header-template :: books-link}"></div>
+</head>
+    <body>
+        <h2>Unfortunately, an error has occurred</h2>
+        <div>
+            <p><span th:text = "${(message == null) ? '' : 'Cause: ' + message}"></span></p>
+        </div>
+    </body>
+</html>
