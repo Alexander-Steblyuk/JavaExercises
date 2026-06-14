@@ -1,0 +1,25 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Authors</title>
+        <div th:replace="~{header-template :: auth-link}"></div>
+        <br>
+        <div th:replace="~{header-template :: books-link}"></div>
+        <link rel="stylesheet" href="../css/styles.css">
+        <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+        <script src="../js/common.js"></script>
+        <script src="../js/authors.js"></script>
+    </head>
+    <body>
+        <h2>Genres</h2>
+        <table id="authors">
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Full name</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </body>
+</html>

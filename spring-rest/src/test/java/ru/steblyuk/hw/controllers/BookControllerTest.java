@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,6 +19,7 @@ import ru.steblyuk.hw.dto.AuthorDto;
 import ru.steblyuk.hw.dto.BookDto;
 import ru.steblyuk.hw.dto.GenreDto;
 import ru.steblyuk.hw.exceptions.EntityNotFoundException;
+import ru.steblyuk.hw.security.JwtAuthenticationFilter;
 import ru.steblyuk.hw.services.BookService;
 
 import java.util.List;
@@ -29,7 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BookController.class)
+@WebMvcTest(value = BookController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class,
+        excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = JwtAuthenticationFilter.class) })
 public class BookControllerTest {
 
     private static final Object NOT_FOUND_ERROR_RESULT = Map.entry("message", "Nothing was found by this id");
@@ -39,6 +45,9 @@ public class BookControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Value("${books-api.context-path}")
+    private String urlPrefix;
 
     private List<AuthorDto> dbAuthors;
 
@@ -62,7 +71,7 @@ public class BookControllerTest {
         long bookId = expectedBook.id();
         String expectedBookJson = objectMapper.writeValueAsString(expectedBook);
         when(bookService.findById(bookId)).thenReturn(expectedBook);
-        mockMvc.perform(get("/books/{id}", bookId))
+        mockMvc.perform(get(urlPrefix + "/books/{id}", bookId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedBookJson));
@@ -74,7 +83,7 @@ public class BookControllerTest {
         long bookId = -1;
         var expectedBookJson = objectMapper.writeValueAsString(NOT_FOUND_ERROR_RESULT);
         when(bookService.findById(bookId)).thenThrow(EntityNotFoundException.class);
-        mockMvc.perform(get("/books/{id}", bookId))
+        mockMvc.perform(get(urlPrefix+ "/books/{id}", bookId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedBookJson));
@@ -85,7 +94,7 @@ public class BookControllerTest {
     void shouldReturnCorrectBooksList() throws Exception {
         var expectedBooksJson = objectMapper.writeValueAsString(dbBooks);
         when(bookService.findAll()).thenReturn(dbBooks);
-        mockMvc.perform(get("/books"))
+        mockMvc.perform(get(urlPrefix+ "/books"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedBooksJson));
@@ -101,7 +110,7 @@ public class BookControllerTest {
         var newBookJson = objectMapper.writeValueAsString(newBook);
         var expectedBookJson = objectMapper.writeValueAsString(savedBook);
         when(bookService.save(newBook)).thenReturn(savedBook);
-        mockMvc.perform(post("/books")
+        mockMvc.perform(post("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newBookJson))
                 .andExpect(status().isCreated())
@@ -116,7 +125,7 @@ public class BookControllerTest {
                 List.of(dbGenres.get(3), dbGenres.get(4)));
         String expectedBookJson = objectMapper.writeValueAsString(expectedBook);
         when(bookService.save(expectedBook)).thenReturn(expectedBook);
-        mockMvc.perform(put("/books")
+        mockMvc.perform(put("/api/v1/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(expectedBookJson))
                 .andExpect(status().isOk())
@@ -129,7 +138,7 @@ public class BookControllerTest {
     void shouldShowErrorsWhenSavingNewBookNotValid() throws Exception {
         var incorrectBook = new BookDto(null, "", null, List.of());
         var incorrectJson = objectMapper.writeValueAsString(incorrectBook);
-        mockMvc.perform(post("/books")
+        mockMvc.perform(post(urlPrefix+ "/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(incorrectJson))
                 .andExpect(status().isBadRequest());
@@ -138,7 +147,7 @@ public class BookControllerTest {
     @DisplayName("Должен удалять книгу по id и возвращать корректный статус")
     @Test
     void shouldDeleteBook() throws Exception {
-        mockMvc.perform(delete("/books/{id}", 1L))
+        mockMvc.perform(delete("/api/v1/books/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 

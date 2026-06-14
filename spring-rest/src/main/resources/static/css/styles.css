@@ -1,0 +1,6 @@
+th, td {
+    border: 1px, solid, black
+}
+input:required:invalid, select:required:invalid {
+  border: 2px solid red;
+}

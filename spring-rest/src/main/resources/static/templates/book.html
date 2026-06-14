@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Book</title>
+        <div th:replace="~{header-template :: auth-link}"></div>
+        <br>
+        <div th:replace="~{header-template :: books-link}"></div>
+        <link rel="stylesheet" href="../css/styles.css">
+        <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+        <script src="../js/common.js"></script>
+        <script src="../js/book.js"></script>
+    </head>
+    <body>
+        <h2>Book</h2>
+        <div>
+            <p><span id="title"></span></p>
+            <p><span id="author"></span></p>
+            <label for="genres">Genres:</label>
+            <ul id="genres">
+            </ul>
+        </div>
+        <div>
+            <label for="comments">Comments</label>
+            <table id="comments">
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

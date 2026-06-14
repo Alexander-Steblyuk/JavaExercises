@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.steblyuk.hw.services.JwtService;
 import ru.steblyuk.hw.services.UserService;
@@ -22,7 +22,7 @@ import ru.steblyuk.hw.services.UserService;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-@Service
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String HEADER_NAME = "Authorization";
