@@ -1,0 +1,38 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Book edit</title>
+        <link rel="stylesheet" href="../../css/styles.css">
+        <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+        <script src="../../js/common.js"></script>
+        <script src="../../js/book-edit.js"></script>
+        <div th:replace="~{header-template :: auth-link}"></div>
+        <br>
+        <div th:replace="~{header-template :: books-link}"></div>
+    </head>
+    <body>
+        <h2>Book edit</h2>
+        <form id="bookForm" aria-orientation="vertical">
+            <div>
+                <input type="hidden" id="id">
+            </div>
+            <div>
+                <label for="title">Title</label>
+                <input type="text" id="title" placeholder="Title" required>
+            </div>
+            <br>
+            <div>
+                <label for="author">Author</label>
+                <select id="author" required>
+                </select>
+            </div>
+            <br>
+            <div>
+                <label for="genres">Genres</label>
+                <select id="genres" multiple="multiple" required>
+                </select>
+            </div>
+            <br>
+            <button type="submit">Save book</button>
+        </form>
+    </body>
+</html>

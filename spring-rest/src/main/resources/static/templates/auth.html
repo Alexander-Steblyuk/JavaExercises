@@ -1,0 +1,53 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Authenticate</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <div th:replace="~{header-template :: books-link}"></div>
+</head>
+<body>
+<h2>Authenticate</h2>
+<form id="authForm" aria-orientation="vertical">
+    <div>
+        <label for="login">Login</label>
+        <input type="text" id="login" placeholder="Login">
+    </div>
+    <br>
+    <div>
+        <label for="passwd">Password</label>
+        <input type="password" id="passwd" placeholder="Password">
+    </div>
+    <br>
+    <button type="submit">Sign in</button>
+</form>
+</body>
+<script>
+    $(function () {
+        const form = document.getElementById('authForm')
+        form.addEventListener('submit', function(event) {
+          event.preventDefault()
+          const loginInput = document.getElementById('login')
+          const passwdInput = document.getElementById('passwd')
+
+          const auth = { login: loginInput.value, password: passwdInput.value }
+          const authJsonString = JSON.stringify(auth);
+          fetch('/api/v1/auth/sign-in', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: authJsonString })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`)
+                }
+                return response.json()
+            })
+            .then(data => {
+                localStorage.setItem('token', data.token);
+                if (document.referrer.length != 0) {
+                    window.location = document.referrer
+                } else {
+                    window.location = '/books'
+                }
+            })
+            .catch(error => console.error('Ошибка:', error))
+        });
+    })
+</script>
+</html>
