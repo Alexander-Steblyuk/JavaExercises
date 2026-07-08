@@ -13,21 +13,24 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.steblyuk.hw.services.JwtService;
-import ru.steblyuk.hw.services.UserService;
 
 import java.io.IOException;
+
+import static java.util.Objects.nonNull;
 
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String HEADER_NAME = "Authorization";
+
     private final JwtService jwtService;
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -51,24 +54,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var jwt = authHeader.substring(BEARER_PREFIX.length());
         var username = jwtService.extractLogin(jwt);
 
-        if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService
-                    .getDetailsService()
-                    .loadUserByUsername(username);
+        if (StringUtils.isBlank(username) || nonNull(SecurityContextHolder.getContext().getAuthentication())) {
+            return;
+        }
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
+        if (jwtService.isTokenValid(jwt, userDetails)) {
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                context.setAuthentication(authToken);
-                SecurityContextHolder.setContext(context);
-            }
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            context.setAuthentication(authToken);
+            SecurityContextHolder.setContext(context);
         }
     }
 }

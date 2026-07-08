@@ -99,7 +99,7 @@ function checkAuthToken(token) {
     if (token == null) {
         window.location = "/auth"
     }
-    const isNotAdmin = parseJwt(token).role != 'ROLE_ADMIN'
+    const isNotAdmin = !parseJwt(token).roles.includes('ADMIN')
     if (isNotAdmin) {
         window.location = "/error"
     }

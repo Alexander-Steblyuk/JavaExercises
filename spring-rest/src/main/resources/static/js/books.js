@@ -2,7 +2,7 @@ $(function () {
     const authToken = localStorage.getItem('token')
     initAuthBtn(authToken)
     $.get('/api/v1/books').done(function (books) {
-        const isAdmin = authToken != null ? parseJwt(authToken).role == 'ROLE_ADMIN' : false
+        const isAdmin = authToken != null ? parseJwt(authToken).roles.includes('ADMIN') : false
         if (isAdmin) {
             $('table').before(`
                 <p><a href="/books/add">Add a new book</a></p>
@@ -50,7 +50,7 @@ function doDelete (event, bookId) {
                 localStorage.removeItem('token')
                 throw new Error('UNAUTHORIZED')
             }
-            window.location = 'books/edit/1'
+            window.location.reload()
         },
         error: function (xhr, thrown) {
             if (xhr.status == 401) {

@@ -8,19 +8,27 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import ru.steblyuk.hw.models.Role;
 import ru.steblyuk.hw.models.User;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
 @Service
 public class JwtServiceImpl implements JwtService {
-    @Value("${jwt.token.signing.key}")
-    private String signingKey;
+
+    private final Key signingKey;
+
+    public JwtServiceImpl(@Value("${jwt.token.signing.key}") String signingKey) {
+        byte[] bytes = Decoders.BASE64.decode(signingKey);
+        this.signingKey = Keys.hmacShaKeyFor(bytes);
+    }
 
     @Override
     public String extractLogin(String token) {
@@ -32,7 +40,7 @@ public class JwtServiceImpl implements JwtService {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
             claims.put("login", customUserDetails.getLogin());
-            claims.put("role", customUserDetails.getRole());
+            claims.put("roles", getRolesCodes(customUserDetails));
         }
         return generateToken(claims, userDetails);
     }
@@ -70,7 +78,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        byte[] bytes = Decoders.BASE64.decode(signingKey);
-        return Keys.hmacShaKeyFor(bytes);
+        return signingKey;
+    }
+
+    private List<String> getRolesCodes(User user) {
+        return user.getRoles().stream()
+                .map(Role::getCode)
+                .collect(Collectors.toList());
     }
 }

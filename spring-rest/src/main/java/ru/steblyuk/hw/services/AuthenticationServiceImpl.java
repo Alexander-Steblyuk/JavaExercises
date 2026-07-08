@@ -3,6 +3,7 @@ package ru.steblyuk.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.steblyuk.hw.dto.AuthenticationRequest;
 import ru.steblyuk.hw.dto.AuthenticationResponse;
@@ -11,8 +12,8 @@ import ru.steblyuk.hw.dto.AuthenticationResponse;
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final UserService userService;
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -22,8 +23,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 request.password()
         ));
 
-        var user = userService.getDetailsService()
-                .loadUserByUsername(request.login());
+        var user = userDetailsService.loadUserByUsername(request.login());
 
         var jwt = jwtService.generateToken(user);
         return new AuthenticationResponse(jwt);
